@@ -1,0 +1,13 @@
+# ClusterIP Service: stable in-cluster address for MySQL (db-<id>:3306)
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-135959252
+  namespace: migrate-135959252
+spec:
+  type: ClusterIP              # reachable only inside the cluster
+  selector:
+    app: db-135959252            # must match the Pod label in db-deployment.yaml
+  ports:
+    - port: 3306               # port clients connect to on the Service
+      targetPort: 3306         # port the MySQL container listens on
