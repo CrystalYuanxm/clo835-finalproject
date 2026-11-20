@@ -1,0 +1,43 @@
+# MySQL Deployment: 1 replica, data on the PVC, seeded from the ConfigMap on first start
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-135959252
+  namespace: migrate-135959252
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate               # stop old Pod before starting new one (PVC is ReadWriteOnce)
+  selector:
+    matchLabels:
+      app: db-135959252
+  template:
+    metadata:
+      labels:
+        app: db-135959252          # must match selector above (and the Service later)
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4       # pinned version: same on a and b, so dumps match
+          envFrom:
+            - secretRef:
+                name: db-credentials-135959252   # loads all 4 MYSQL_* variables
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql                 # MySQL data directory
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d    # SQL here runs on first start
+          readinessProbe:        # Ready only when the real server accepts TCP connections
+            exec:
+              command: ["sh", "-c", "mysqladmin ping -h 127.0.0.1 --silent"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: db-data-135959252
+        - name: init
+          configMap:
+            name: db-init-135959252

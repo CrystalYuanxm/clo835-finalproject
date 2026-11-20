@@ -1,0 +1,13 @@
+# PVC: persistent disk for MySQL data (survives Pod restarts)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-data-135959252
+  namespace: migrate-135959252
+spec:
+  storageClassName: standard     # kind's default StorageClass (local-path)
+  accessModes:
+    - ReadWriteOnce              # one node reads/writes; fine for a single DB Pod
+  resources:
+    requests:
+      storage: 1Gi               # plenty for the seed data
