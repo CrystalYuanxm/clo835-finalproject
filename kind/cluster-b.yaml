@@ -1,0 +1,13 @@
+# kind config for cluster "b"
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    # Share the same host folder as cluster a, so the restore Job can read the dump
+    extraMounts:
+      - hostPath: /tmp/migrate-135959252
+        containerPath: /tmp/migrate-135959252
+    # Expose the app NodePort on the EC2 host (curl localhost:30081)
+    extraPortMappings:
+      - containerPort: 30081
+        hostPort: 30081
