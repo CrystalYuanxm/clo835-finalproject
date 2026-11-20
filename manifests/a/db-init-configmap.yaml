@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-135959252
+  namespace: migrate-135959252
+data:
+  01-schema-seed.sql: |
+    CREATE TABLE IF NOT EXISTS records (
+      id      INT NOT NULL AUTO_INCREMENT,
+      payload VARCHAR(100) NOT NULL,
+      PRIMARY KEY (id)
+    );
+
+    INSERT INTO records (payload)
+    WITH RECURSIVE seq (n) AS (
+      SELECT 1
+      UNION ALL
+      SELECT n + 1 FROM seq WHERE n < 500
+    )
+    SELECT CONCAT('seed-135959252-', LPAD(n, 6, '0')) FROM seq;

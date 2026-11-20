@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-__SID__
+  namespace: migrate-__SID__
+data:
+  01-schema-seed.sql: |
+    CREATE TABLE IF NOT EXISTS records (
+      id      INT NOT NULL AUTO_INCREMENT,
+      payload VARCHAR(100) NOT NULL,
+      PRIMARY KEY (id)
+    );
+
+    INSERT INTO records (payload)
+    WITH RECURSIVE seq (n) AS (
+      SELECT 1
+      UNION ALL
+      SELECT n + 1 FROM seq WHERE n < 500
+    )
+    SELECT CONCAT('seed-__SID__-', LPAD(n, 6, '0')) FROM seq;
